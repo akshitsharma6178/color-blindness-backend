@@ -34,11 +34,7 @@ app.post('/upload', callName);
 
 async function callName(req, res) { 
     msg = await controller.upload(req, res);
-    // res.send("msg")
-    // console.log(JSON.stringify(req.obj))
     if (msg){
-      // console.log(req.newFName)
-      // console.log(req.body.obj)
       var spawn = require("child_process").spawn;
       obj_obj = JSON.parse(req.body.obj)
 
