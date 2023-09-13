@@ -40,6 +40,9 @@ app.get('/file', (req, res) => {
 app.post('/upload',upload.single('file'), callName);
 
 async function callName(req, res) { 
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   let imageBuffer = req.file.buffer;
     // msg = await controller.upload(req, res);
     if (imageBuffer){
