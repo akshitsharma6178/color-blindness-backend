@@ -8,10 +8,15 @@ const app = express()
 const multer = require('multer')
 const port = 3000
 const upload = multer();
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 204 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions))
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}))
-app.use(cors())
 app.get('/', (req, res) => {
   res.json({
     message:'Hello World!!'
