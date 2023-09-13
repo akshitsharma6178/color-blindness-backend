@@ -31,13 +31,10 @@ app.get('/', (req, res) => {
 app.post('/upload',allowCors, upload.single('file'), callName);
 
 async function callName(req, res) { 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   let imageBuffer = req.file.buffer;
     if (imageBuffer){
       var spawn = require("child_process").spawn;
-
+      obj_obj = JSON.parse(req.body.obj);
       var obj_val = {"selectedValue": +obj_obj["selectedValue"], "redSlider": +obj_obj["redSlider"], "blueSlider": +obj_obj["blueSlider"], "greenSlider": +obj_obj["greenSlider"]};
       var obj_str = JSON.stringify(obj_val)
       var process = spawn('python',["./Script/img_final.py", req.newFName, obj_str], {stdin: 'pipe'});
