@@ -6,6 +6,7 @@ const controller = require(__dirname + '/controller');
 const router = express.Router();
 const app = express()
 const port = 3000
+const upload = multer();
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}))
@@ -30,29 +31,51 @@ app.get('/file', (req, res) => {
 });
 
 
-app.post('/upload', callName);
+app.post('/upload',upload.single('file'), callName);
 
 async function callName(req, res) { 
-    msg = await controller.upload(req, res);
-    if (msg){
+  let imageBuffer = req.file.buffer;
+    // msg = await controller.upload(req, res);
+    if (imageBuffer){
       var spawn = require("child_process").spawn;
-      obj_obj = JSON.parse(req.body.obj)
+      // obj_obj = JSON.parse(req.body.obj)
 
       var obj_val = {"selectedValue": +obj_obj["selectedValue"], "redSlider": +obj_obj["redSlider"], "blueSlider": +obj_obj["blueSlider"], "greenSlider": +obj_obj["greenSlider"]};
       var obj_str = JSON.stringify(obj_val)
       var process = spawn('python',["./Script/img_final.py", req.newFName, obj_str], {stdin: 'pipe'});
+      process.stdin.write(imageBuffer);
+      process.stdin.end();
+      let dataChunks = []
       
       process.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
       });
 
       process.stdout.on('data', function(data) { 
-        // console.log('data is',data)
-        // res.send(JSON.stringify(data))
-        var buffer = Buffer.from(data, 'base64');
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.send(buffer) 
+        dataChunks.push(data)
       })
+      process.on('close', (code) => { //python script exit
+        console.log(`child process exited with code ${code}`);
+        if(code !== 0) {
+          if(!res.headersSent) {
+            res.status(500).send({error: 'Internal Server Error: Script Failed to execute'})
+            console.error('index.js: main.py Script faliure')
+          }
+        } else {
+          if(dataChunks.length > 0) {
+            let data = Buffer.concat(dataChunks);
+            res.writeHead(200, {
+              'Content-Type': 'image/jpeg',
+              'Content-Length': data.length
+            });
+            res.end(data);
+          } else {
+            if(!res.headersSent) {
+              res.status(500).send({error: 'Internal Server Error: No data to send'})
+            }
+          }
+        }
+    });
     }
 
     // console.log(req.body)
