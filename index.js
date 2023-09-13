@@ -21,38 +21,22 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({extended: true}))
 app.get('/', (req, res) => {
   res.json({
     message:'Hello World!!'
   })
 })
 
-app.get('/file', (req, res) => {
-  // const filePath = req.body.path;
-  const filePath = __dirname + '/uploads/ai-technology-brain-background-digital-transformation-concept-updated.jpg';
-  // fs.readFile('.' + filePath, (err, data) => {
-  //   if (err) {
-  //     res.status(500).send({ error: 'Unable to read file' });
-  //   } else {
-  //     res.send(data);
-  //   }
-  // });
-  res.sendFile(filePath);
-});
 
-
-app.post('/upload',upload.single('file'), callName);
+app.post('/upload',allowCors, upload.single('file'), callName);
 
 async function callName(req, res) { 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   let imageBuffer = req.file.buffer;
-    // msg = await controller.upload(req, res);
     if (imageBuffer){
       var spawn = require("child_process").spawn;
-      // obj_obj = JSON.parse(req.body.obj)
 
       var obj_val = {"selectedValue": +obj_obj["selectedValue"], "redSlider": +obj_obj["redSlider"], "blueSlider": +obj_obj["blueSlider"], "greenSlider": +obj_obj["greenSlider"]};
       var obj_str = JSON.stringify(obj_val)
@@ -91,30 +75,8 @@ async function callName(req, res) {
         }
     });
     }
-
-    // console.log(req.body)
-    // res.send(JSON.stringify(req));
-    // // Use child_process.spawn method from  
-    // // child_process module and assign it 
-    // // to variable spawn 
-    // var spawn = require("child_process").spawn; 
-    // var process = spawn('python',["./Script/video.py", 
-    //                         req.body] ); 
-    // // with arguments and send this data to res object 
-    // process.stdout.on('data', function(data) { 
-    //     res.send(data); 
-    // } ) 
 } 
 
-// app.post('/login', (req, res)=>{
-//   let user = req.body.user;
-//   let pass = req.body.pass;
-//   if(user == 'akshit' && pass == 'akshit')
-//     data = {'login' : 1}
-//   else 
-//     data = {'login' : 0}
-//   res.send(data);
-// })
 
 app.post('/login', (req, res) => {
   const user = req.body.user;
@@ -190,6 +152,19 @@ app.post('/register', (req, res) => {
     }
   });
 });
+function allowCors(req, res, next) {
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  
+  if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
+  }
+  
+  next();
+}
 
 app.listen(port)
 
