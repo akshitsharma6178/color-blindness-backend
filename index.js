@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const controller = require(__dirname + '/controller');
 const router = express.Router();
 const app = express()
+const multer = require('multer')
 const port = 3000
 const upload = multer();
 
